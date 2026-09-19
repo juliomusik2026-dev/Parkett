@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Parkett">
+<title>Parkett</title>
+<link rel="apple-touch-icon" id="ati" href="">
+<style>
+:root{
+  --bg:#f4f5f8;--surface:#ffffff;--ink:#121a2e;--muted:#6a7288;--line:#e2e5ec;
+  --accent:#1f3fd6;--accent-ink:#ffffff;--up:#0c9560;--down:#d0343e;--upbg:#e3f5ec;--downbg:#fbe6e8;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0d1018;--surface:#171b26;--ink:#eef1f7;--muted:#98a1b6;--line:#262c3b;
+    --accent:#6f8dff;--accent-ink:#0d1018;--up:#2fc98b;--down:#ff6672;--upbg:#12332a;--downbg:#3a1a20;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0d1018;--surface:#171b26;--ink:#eef1f7;--muted:#98a1b6;--line:#262c3b;
+  --accent:#6f8dff;--accent-ink:#0d1018;--up:#2fc98b;--down:#ff6672;--upbg:#12332a;--downbg:#3a1a20;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums;min-height:100%}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+.wrap{max-width:560px;margin:0 auto;padding:16px 16px 110px}
+h1{font-size:15px;font-weight:600;color:var(--muted);margin:4px 0 6px}
+.big{font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.sub{font-size:15px;margin-top:4px;font-weight:600}
+.up{color:var(--up)}.down{color:var(--down)}
+.muted{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:16px;overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;text-align:left;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.grow{flex:1;min-width:0}
+.nm{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm{font-size:13px;color:var(--muted)}
+.r{text-align:right}
+.badge{display:inline-block;font-size:13px;font-weight:600;padding:2px 8px;border-radius:6px}
+.badge.up{background:var(--upbg)}.badge.down{background:var(--downbg)}
+.sec{font-size:17px;font-weight:700;margin:26px 2px 0}
+.kv{display:flex;justify-content:space-between;padding:13px 16px;border-top:1px solid var(--line)}
+.kv:first-child{border-top:0}
+.empty{padding:22px 16px;color:var(--muted);font-size:15px}
+.rng{display:flex;gap:6px;margin-top:8px}
+.rng button{flex:1;padding:8px 0;border-radius:9px;font-size:14px;font-weight:600;color:var(--muted)}
+.rng button.on{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+svg.ch{width:100%;height:210px;display:block;touch-action:pan-y;margin-top:12px}
+.tabbar{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);z-index:10}
+.tabbar button{flex:1;padding:12px 0 10px;font-size:12px;font-weight:600;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
+.tabbar button.on{color:var(--accent)}
+.tabbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#detail{position:fixed;inset:0;background:var(--bg);z-index:20;overflow-y:auto;padding-top:env(safe-area-inset-top,0px);display:none}
+#detail.open{display:block}
+.back{padding:14px 16px;font-weight:600;color:var(--accent);font-size:16px}
+.actions{position:fixed;left:0;right:0;bottom:0;z-index:21;background:var(--bg);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));display:none;gap:10px}
+.actions.open{display:flex}
+.btn{flex:1;padding:15px;border-radius:12px;font-weight:700;font-size:16px;text-align:center}
+.btn.p{background:var(--accent);color:var(--accent-ink)}
+.btn.s{background:var(--surface);border:1px solid var(--line)}
+.btn[disabled]{opacity:.4}
+#back2{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:30;display:none}
+#sheet{position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--surface);border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:none;max-width:560px;margin:0 auto}
+#sheet.open,#back2.open{display:block}
+.seg{display:flex;background:var(--bg);border-radius:10px;padding:3px;margin:12px 0}
+.seg button{flex:1;padding:8px;border-radius:8px;font-weight:600;font-size:15px;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.qty{display:flex;align-items:center;gap:10px;margin:8px 0}
+.qty button.st{width:46px;height:46px;border-radius:12px;background:var(--bg);font-size:22px;font-weight:600}
+.qty input{flex:1;min-width:0;height:46px;text-align:center;font:inherit;font-size:20px;font-weight:700;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink)}
+.chips{display:flex;gap:8px;margin-bottom:10px}
+.chips button{flex:1;padding:8px 0;border-radius:9px;background:var(--bg);font-size:14px;font-weight:600}
+.err{color:var(--down);font-size:14px;min-height:20px;margin-top:6px}
+#toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-weight:600;font-size:14px;z-index:40;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90%;text-align:center}
+#toast.show{opacity:1}
+.note{font-size:13px;color:var(--muted);margin:18px 4px 0}
+.danger{color:var(--down);font-weight:600;padding:14px 16px;width:100%;text-align:left}
+@media (prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap" id="view"></div>
+
+<nav class="tabbar" id="tabs">
+  <button data-tab="depot"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M3 12.5h18"/></svg>Depot</button>
+  <button data-tab="markets"><svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 8-9"/><path d="M15 5h5v5"/></svg>Märkte</button>
+  <button data-tab="orders"><svg viewBox="0 0 24 24"><path d="M6 4h12v16l-3-2-3 2-3-2-3 2z"/><path d="M9 9h6M9 13h6"/></svg>Orders</button>
+</nav>
+
+<div id="detail"><div id="dbody"></div></div>
+<div class="actions" id="actions">
+  <button class="btn s" id="bSell" data-sell>Verkaufen</button>
+  <button class="btn p" data-buy>Kaufen</button>
+</div>
+
+<div id="back2" data-close></div>
+<div id="sheet"></div>
+<div id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+var LS="parkett-depot-v1", START=10000, FEE=1;
+var DEFS=[
+ ["AAPL","Apple",188,.27,1.0],["MSFT","Microsoft",415,.25,1.0],["NVDA","NVIDIA",118,.48,1.5],
+ ["AMZN","Amazon",176,.32,1.2],["TSLA","Tesla",212,.55,1.6],["SAP","SAP",192,.26,.9],
+ ["SIE","Siemens",176,.23,.9],["ALV","Allianz",268,.19,.7],["VOW3","Volkswagen",108,.28,1.1],
+ ["BMW","BMW",96,.25,1.0],["ADS","adidas",228,.33,1.1],["NESN","Nestlé",89,.15,.5]
+];
+var RNG={H:36e5,D:864e5,W:6048e5}, RL={H:"1 Std.",D:"1 Tag",W:"1 Woche"};
+var EUR=new Intl.NumberFormat("de-DE",{style:"currency",currency:"EUR"});
+var NUM=new Intl.NumberFormat("de-DE",{minimumFractionDigits:2,maximumFractionDigits:2});
+var $=function(s){return document.querySelector(s)};
+function eur(v){return EUR.format(v)}
+function sgn(v){return (v>=0?"+":"−")+EUR.format(Math.abs(v))}
+function pct(v){return (v>=0?"+":"−")+NUM.format(Math.abs(v))+" %"}
+function cls(v){return v>=0?"up":"down"}
+function gauss(){var u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function tfmt(t){var d=new Date(t);return d.toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})+" "+d.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+
+/* ---------- Zustand ---------- */
+var S=null;
+function initHist(def){
+  var p=def[2],s=def[3],dt=30/98280,n=220,stepMs=7*864e5/n,now=Date.now(),arr=[[now,p]];
+  for(var i=1;i<=n;i++){var r=(0.08-.5*s*s)*dt+s*Math.sqrt(dt)*gauss();p=p/Math.exp(r);arr.unshift([now-i*stepMs,p])}
+  return arr;
+}
+function fresh(){
+  var st={};DEFS.forEach(function(d){var h=initHist(d);st[d[0]]={h:h,p:h[h.length-1][1]}});
+  return {cash:START,hold:{},tx:[],st:st,pv:[[Date.now(),START]],last:Date.now()};
+}
+function load(){
+  try{var raw=localStorage.getItem(LS);if(raw){var o=JSON.parse(raw);if(o&&o.st&&o.cash!=null)return o}}catch(e){}
+  return fresh();
+}
+function save(){try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+function thin(a){if(a.length>1200){return a.slice(0,600).filter(function(_,i){return i%2===0}).concat(a.slice(600))}return a}
+function value(){var v=S.cash;for(var k in S.hold)v+=S.hold[k].q*S.st[k].p;return v}
+function step(dtMin,t){
+  var dt=dtMin/98280,zm=gauss();
+  DEFS.forEach(function(d){
+    var st=S.st[d[0]],s=d[3],z=(d[4]>1.3?.7:.6)*zm+.8*gauss();
+    st.p=Math.max(1,st.p*Math.exp((0.08-.5*s*s)*dt+s*Math.sqrt(dt)*z));
+    st.h.push([t,st.p]);st.h=thin(st.h);
+  });
+  S.pv.push([t,value()]);S.pv=thin(S.pv);
+}
+function catchUp(){
+  var now=Date.now(),el=(now-S.last)/1000;
+  if(el>20){
+    var sim=Math.min(el/60*3,1000),n=Math.max(1,Math.min(120,Math.ceil(sim/30))),dt=sim/n;
+    for(var i=1;i<=n;i++)step(dt,S.last+(now-S.last)*i/n);
+  }
+  S.last=now;
+}
+function priceAgo(sym,ms){
+  var h=S.st[sym].h,tg=Date.now()-ms;
+  for(var i=0;i<h.length;i++)if(h[i][0]>=tg)return h[i][1];
+  return h[0][1];
+}
+function stats(){
+  var v=value(),day=0;
+  for(var k in S.hold)day+=S.hold[k].q*(S.st[k].p-priceAgo(k,RNG.D));
+  return {v:v,day:day,dayPct:day/Math.max(1,v-day)*100,tot:v-START,totPct:(v-START)/START*100};
+}
+
+/* ---------- Diagramme ---------- */
+function slice(h,ms){
+  var tg=Date.now()-ms,o=h.filter(function(p){return p[0]>=tg});
+  if(o.length<2)o=h.slice(-2);
+  return o;
+}
+function spark(sym){
+  var pts=slice(S.st[sym].h,RNG.D),W=84,H=30,mn=Infinity,mx=-Infinity;
+  pts.forEach(function(p){mn=Math.min(mn,p[1]);mx=Math.max(mx,p[1])});
+  var t0=pts[0][0],t1=pts[pts.length-1][0],d=pts.map(function(p,i){
+    return (i?"L":"M")+((p[0]-t0)/(t1-t0||1)*W).toFixed(1)+" "+(H-2-(p[1]-mn)/(mx-mn||1)*(H-4)).toFixed(1)}).join("");
+  var up=pts[pts.length-1][1]>=pts[0][1];
+  return '<svg width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'"><path d="'+d+'" fill="none" stroke="var(--'+(up?"up":"down")+')" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+}
+var CH={pts:[],W:360,H:210,mn:0,mx:1,t0:0,t1:1};
+function chart(hist,rk){
+  var pts=slice(hist,RNG[rk]),W=360,H=210,pad=14,mn=Infinity,mx=-Infinity;
+  pts.forEach(function(p){mn=Math.min(mn,p[1]);mx=Math.max(mx,p[1])});
+  if(mx-mn<1e-9){mx+=1;mn-=1}
+  var t0=pts[0][0],t1=pts[pts.length-1][0];
+  function X(t){return (t-t0)/(t1-t0||1)*W}
+  function Y(v){return pad+(1-(v-mn)/(mx-mn))*(H-2*pad)}
+  var d=pts.map(function(p,i){return (i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)}).join("");
+  var up=pts[pts.length-1][1]>=pts[0][1],c="var(--"+(up?"up":"down")+")";
+  CH={pts:pts,W:W,H:H,mn:mn,mx:mx,t0:t0,t1:t1,X:X,Y:Y};
+  var base=Y(pts[0][1]);
+  return '<svg class="ch" id="chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+
+    '<line x1="0" x2="'+W+'" y1="'+base.toFixed(1)+'" y2="'+base.toFixed(1)+'" stroke="var(--line)" stroke-dasharray="3 4" vector-effect="non-scaling-stroke"/>'+
+    '<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>'+
+    '<line id="xh" x1="0" x2="0" y1="0" y2="'+H+'" stroke="var(--muted)" stroke-width="1" vector-effect="non-scaling-stroke" style="display:none"/></svg>';
+}
+
+/* ---------- Ansicht ---------- */
+var tab="depot",detail=null,rng="D",scrub=false,T=null;
+function rngBtns(){
+  return '<div class="rng">'+Object.keys(RL).map(function(k){return '<button data-rng="'+k+'"'+(k===rng?' class="on"':'')+'>'+RL[k]+'</button>'}).join("")+'</div>';
+}
+function vDepot(){
+  var s=stats(),pv=S.pv,keys=Object.keys(S.hold);
+  var h='<h1>Depotwert</h1><div class="big">'+eur(s.v)+'</div>'+
+    '<div class="sub '+cls(s.day)+'">'+sgn(s.day)+' ('+pct(s.dayPct)+') <span class="muted" style="font-weight:500">24 Std.</span></div>';
+  h+=chart(pv,rng)+rngBtns();
+  h+='<div class="card"><div class="kv"><span class="muted">Verfügbar</span><b>'+eur(S.cash)+'</b></div>'+
+     '<div class="kv"><span class="muted">Ergebnis seit Start</span><b class="'+cls(s.tot)+'">'+sgn(s.tot)+' ('+pct(s.totPct)+')</b></div></div>';
+  h+='<div class="sec">Positionen</div><div class="card">';
+  if(!keys.length)h+='<div class="empty">Dein Depot ist leer. Öffne den Reiter Märkte und kaufe deine erste Aktie.</div>';
+  keys.forEach(function(k){
+    var p=S.hold[k],cur=S.st[k].p,pl=p.q*(cur-p.avg),pp=(cur/p.avg-1)*100,nm=name(k);
+    h+='<button class="row" data-open="'+k+'"><div class="grow"><div class="nm">'+nm+'</div><div class="sm">'+p.q+' Stk. · Ø '+eur(p.avg)+'</div></div>'+
+       '<div class="r"><div class="nm">'+eur(p.q*cur)+'</div><div class="sm '+cls(pl)+'">'+sgn(pl)+' ('+pct(pp)+')</div></div></button>';
+  });
+  return h+'</div><p class="note">Alle Kurse sind simuliert. Es wird nichts echtes gehandelt.</p>';
+}
+function name(k){for(var i=0;i<DEFS.length;i++)if(DEFS[i][0]===k)return DEFS[i][1];return k}
+function vMarkets(){
+  var h='<h1>Märkte</h1><div class="big" style="font-size:28px">Aktien</div><div class="card">';
+  DEFS.forEach(function(d){
+    var k=d[0],p=S.st[k].p,c=(p/priceAgo(k,RNG.D)-1)*100;
+    h+='<button class="row" data-open="'+k+'"><div class="grow"><div class="nm">'+d[1]+'</div><div class="sm">'+k+'</div></div>'+spark(k)+
+       '<div class="r" style="min-width:92px"><div class="nm">'+eur(p)+'</div><span class="badge '+cls(c)+'">'+pct(c)+'</span></div></button>';
+  });
+  return h+'</div><p class="note">Alle Kurse sind simuliert und haben nichts mit echten Kursen zu tun.</p>';
+}
+var resetArmed=false;
+function vOrders(){
+  var h='<h1>Orders</h1><div class="big" style="font-size:28px">Verlauf</div><div class="card">';
+  if(!S.tx.length)h+='<div class="empty">Noch keine Orders ausgeführt.</div>';
+  S.tx.slice(0,60).forEach(function(t){
+    var buy=t.side==="buy",tot=t.q*t.p;
+    h+='<div class="row"><div class="grow"><div class="nm">'+(buy?"Kauf":"Verkauf")+' · '+name(t.sym)+'</div><div class="sm">'+t.q+' × '+eur(t.p)+' · '+tfmt(t.t)+'</div></div>'+
+       '<div class="r"><div class="nm">'+(buy?"−":"+")+eur(tot)+'</div><div class="sm">Gebühr '+eur(t.fee)+'</div></div></div>';
+  });
+  h+='</div><div class="sec">Konto</div><div class="card">'+
+     '<div class="kv"><span class="muted">Startkapital</span><b>'+eur(START)+'</b></div>'+
+     '<div class="kv"><span class="muted">Gebühr pro Order</span><b>'+eur(FEE)+'</b></div>'+
+     '<button class="danger" data-reset>'+(resetArmed?"Wirklich alles zurücksetzen?":"Depot zurücksetzen")+'</button></div>';
+  return h;
+}
+function render(){
+  $("#view").innerHTML=tab==="depot"?vDepot():tab==="markets"?vMarkets():vOrders();
+  document.querySelectorAll("#tabs button").forEach(function(b){b.classList.toggle("on",b.dataset.tab===tab)});
+  if(tab==="depot")bindChart(S.pv,"Depotwert");
+}
+function renderDetail(){
+  if(!detail)return;
+  var k=detail,st=S.st[k],p=st.p,pts=slice(st.h,RNG[rng]),ch=(p/pts[0][1]-1)*100,chAbs=p-pts[0][1];
+  var hi=-Infinity,lo=Infinity;pts.forEach(function(q){hi=Math.max(hi,q[1]);lo=Math.min(lo,q[1])});
+  var wk=st.h.map(function(q){return q[1]});
+  var h='<button class="back" data-back>‹ Zurück</button><div class="wrap" style="padding-top:0">'+
+    '<h1>'+name(k)+' · '+k+'</h1><div class="big" id="dprice">'+eur(p)+'</div>'+
+    '<div class="sub '+cls(ch)+'" id="dsub">'+sgn(chAbs)+' ('+pct(ch)+')</div>'+
+    chart(st.h,rng)+rngBtns()+
+    '<div class="card"><div class="kv"><span class="muted">Hoch ('+RL[rng]+')</span><b>'+eur(hi)+'</b></div>'+
+    '<div class="kv"><span class="muted">Tief ('+RL[rng]+')</span><b>'+eur(lo)+'</b></div>'+
+    '<div class="kv"><span class="muted">Hoch (1 Woche)</span><b>'+eur(Math.max.apply(null,wk))+'</b></div>'+
+    '<div class="kv"><span class="muted">Tief (1 Woche)</span><b>'+eur(Math.min.apply(null,wk))+'</b></div></div>';
+  var pos=S.hold[k];
+  if(pos){var pl=pos.q*(p-pos.avg);
+    h+='<div class="sec">Deine Position</div><div class="card">'+
+    '<div class="kv"><span class="muted">Stückzahl</span><b>'+pos.q+'</b></div>'+
+    '<div class="kv"><span class="muted">Einstandskurs</span><b>'+eur(pos.avg)+'</b></div>'+
+    '<div class="kv"><span class="muted">Wert</span><b>'+eur(pos.q*p)+'</b></div>'+
+    '<div class="kv"><span class="muted">Ergebnis</span><b class="'+cls(pl)+'">'+sgn(pl)+' ('+pct((p/pos.avg-1)*100)+')</b></div></div>';}
+  h+='<div style="height:80px"></div></div>';
+  $("#dbody").innerHTML=h;
+  $("#bSell").disabled=!pos;
+  bindChart(st.h,eur(p),true);
+}
+function bindChart(hist,label,isDetail){
+  var svg=$("#chart");if(!svg||!CH.pts.length)return;
+  var xh=$("#xh"),pe=isDetail?$("#dprice"):null,se=isDetail?$("#dsub"):null;
+  var basePrice=pe?pe.textContent:"",baseSub=se?se.textContent:"",baseCls=se?se.className:"";
+  function mv(e){
+    var r=svg.getBoundingClientRect(),x=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width))*CH.W;
+    var tt=CH.t0+(x/CH.W)*(CH.t1-CH.t0),best=CH.pts[0];
+    for(var i=0;i<CH.pts.length;i++)if(Math.abs(CH.pts[i][0]-tt)<Math.abs(best[0]-tt))best=CH.pts[i];
+    var xx=CH.X(best[0]);xh.setAttribute("x1",xx);xh.setAttribute("x2",xx);xh.style.display="";
+    scrub=true;
+    if(pe){pe.textContent=eur(best[1]);se.textContent=tfmt(best[0]);se.className="sub muted"}
+  }
+  function end(){scrub=false;xh.style.display="none";if(pe){pe.textContent=basePrice;se.textContent=baseSub;se.className=baseCls}}
+  svg.addEventListener("pointerdown",mv);svg.addEventListener("pointermove",function(e){if(e.buttons||e.pointerType==="touch")mv(e)});
+  svg.addEventListener("pointerup",end);svg.addEventListener("pointercancel",end);svg.addEventListener("pointerleave",end);
+}
+
+/* ---------- Order-Sheet ---------- */
+function openSheet(mode){
+  T={sym:detail,mode:mode,qty:1};drawSheet();
+  $("#back2").classList.add("open");$("#sheet").classList.add("open");
+}
+function closeSheet(){T=null;$("#back2").classList.remove("open");$("#sheet").classList.remove("open")}
+function drawSheet(){
+  var k=T.sym,pos=S.hold[k],max=T.mode==="buy"?Math.floor((S.cash-FEE)/S.st[k].p):(pos?pos.q:0);
+  $("#sheet").innerHTML='<div style="font-weight:700;font-size:18px">'+name(k)+'</div><div class="sm">Marktorder · Kurs <span id="sp"></span></div>'+
+   '<div class="seg"><button data-mode="buy"'+(T.mode==="buy"?' class="on"':'')+'>Kaufen</button><button data-mode="sell"'+(T.mode==="sell"?' class="on"':'')+'>Verkaufen</button></div>'+
+   '<div class="qty"><button class="st" data-q="-1" aria-label="Weniger">−</button><input id="qi" type="number" inputmode="numeric" min="1" step="1" value="'+T.qty+'" aria-label="Stückzahl"><button class="st" data-q="1" aria-label="Mehr">+</button></div>'+
+   '<div class="chips"><button data-qs="1">1</button><button data-qs="5">5</button><button data-qs="10">10</button><button data-qs="'+Math.max(0,max)+'">Max ('+Math.max(0,max)+')</button></div>'+
+   '<div class="kv" style="padding:8px 0;border:0"><span class="muted">Kurswert</span><b id="sv"></b></div>'+
+   '<div class="kv" style="padding:8px 0;border:0"><span class="muted">Gebühr</span><b>'+eur(FEE)+'</b></div>'+
+   '<div class="kv" style="padding:8px 0;border:0"><span class="muted">'+(T.mode==="buy"?"Gesamtkosten":"Erlös")+'</span><b id="st"></b></div>'+
+   '<div class="err" id="se"></div><button class="btn p" id="ex" style="width:100%" data-exec>'+(T.mode==="buy"?"Kaufen":"Verkaufen")+'</button>';
+  updateSheet();
+  $("#qi").addEventListener("input",function(){T.qty=Math.floor(Number(this.value))||0;updateSheet()});
+}
+function updateSheet(){
+  if(!T)return;
+  var k=T.sym,p=S.st[k].p,q=T.qty,tot=q*p,pos=S.hold[k],err="";
+  if(q<1)err="Gib mindestens 1 Stück ein.";
+  else if(T.mode==="buy"&&tot+FEE>S.cash)err="Nicht genug Guthaben.";
+  else if(T.mode==="sell"&&(!pos||q>pos.q))err="So viele Stücke besitzt du nicht.";
+  $("#sp").textContent=eur(p);$("#sv").textContent=eur(Math.max(0,tot));
+  $("#st").textContent=eur(T.mode==="buy"?tot+FEE:Math.max(0,tot-FEE));
+  $("#se").textContent=err;$("#ex").disabled=!!err;
+}
+function exec(){
+  var k=T.sym,q=T.qty,p=S.st[k].p,h=S.hold[k];
+  if(T.mode==="buy"){
+    if(q<1||q*p+FEE>S.cash)return;
+    S.cash-=q*p+FEE;var oq=h?h.q:0,oa=h?h.avg:0;
+    S.hold[k]={q:oq+q,avg:(oq*oa+q*p)/(oq+q)};
+  }else{
+    if(!h||q<1||q>h.q)return;
+    S.cash+=q*p-FEE;h.q-=q;if(h.q===0)delete S.hold[k];
+  }
+  S.tx.unshift({t:Date.now(),sym:k,side:T.mode,q:q,p:p,fee:FEE});
+  var msg=(T.mode==="buy"?"Gekauft: ":"Verkauft: ")+q+" × "+name(k);
+  closeSheet();save();toast(msg);render();renderDetail();
+}
+var tt=null;
+function toast(m){var e=$("#toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(function(){e.classList.remove("show")},2200)}
+function openDetail(k){detail=k;$("#detail").classList.add("open");$("#actions").classList.add("open");$("#detail").scrollTop=0;renderDetail()}
+function closeDetail(){detail=null;$("#detail").classList.remove("open");$("#actions").classList.remove("open");closeSheet();render()}
+
+/* ---------- Events ---------- */
+document.addEventListener("click",function(e){
+  var t=e.target.closest("button,[data-close]");if(!t)return;
+  var d=t.dataset;
+  if(d.tab){tab=d.tab;resetArmed=false;window.scrollTo(0,0);render()}
+  else if(d.open)openDetail(d.open);
+  else if("back" in d)closeDetail();
+  else if(d.rng){rng=d.rng;render();renderDetail()}
+  else if("buy" in d)openSheet("buy");
+  else if("sell" in d)openSheet("sell");
+  else if("close" in d)closeSheet();
+  else if(d.mode){T.mode=d.mode;T.qty=1;drawSheet()}
+  else if(d.q){T.qty=Math.max(0,T.qty+Number(d.q));$("#qi").value=T.qty;updateSheet()}
+  else if(d.qs!==undefined){T.qty=Number(d.qs);$("#qi").value=T.qty;updateSheet()}
+  else if("exec" in d)exec();
+  else if("reset" in d){
+    if(!resetArmed){resetArmed=true;render();setTimeout(function(){resetArmed=false;if(tab==="orders")render()},4000)}
+    else{resetArmed=false;S=fresh();save();toast("Depot zurückgesetzt");render()}
+  }
+});
+function tick(){
+  step(5,Date.now());S.last=Date.now();
+  if(T)updateSheet();
+  if(scrub)return;
+  if(detail)renderDetail();else render();
+}
+function boot(){
+  S=load();catchUp();save();render();
+  setInterval(tick,3000);setInterval(save,15000);
+  document.addEventListener("visibilitychange",function(){
+    if(document.hidden)save();else{catchUp();if(!scrub){if(detail)renderDetail();else render()}}
+  });
+  window.addEventListener("pagehide",save);
+  try{var c=document.createElement("canvas");c.width=c.height=180;var g=c.getContext("2d");
+    g.fillStyle="#1f3fd6";g.fillRect(0,0,180,180);g.strokeStyle="#fff";g.lineWidth=14;g.lineCap="round";g.lineJoin="round";
+    g.beginPath();g.moveTo(34,124);g.lineTo(70,88);g.lineTo(96,106);g.lineTo(144,56);g.stroke();
+    g.beginPath();g.moveTo(120,56);g.lineTo(144,56);g.lineTo(144,80);g.stroke();
+    $("#ati").href=c.toDataURL("image/png")}catch(e){}
+}
+boot();
+})();
+</script>
+</body>
+</html>
